@@ -1,7 +1,6 @@
 var fs = require('fs');
 var Stream = require('stream');
 var Readable = Stream.Readable;
-var PassThrough = Stream.PassThrough;
 var inherits = require('util').inherits;
 var EventEmitter = require('events').EventEmitter;
 
@@ -12,11 +11,13 @@ function streamstache(tpl) {
   Readable.call(this);
 
   if (typeof tpl != 'string') tpl = tpl.toString();
+
   this.ee = new EventEmitter;
   this.tpl = tpl;
   this.idx = 0;
   this.map = {};
   this.waiting = 0;
+  this.reading = false;
 }
 
 inherits(streamstache, Readable);
@@ -24,6 +25,21 @@ inherits(streamstache, Readable);
 // todo: memoize
 streamstache.prototype._read = function(n) {
   var self = this;
+
+  if (self.stream && !self.reading) {
+    self.reading = true;
+    self.stream.on('readable', function() {
+      var buf = self.stream.read(n);
+      if (buf) self.push(buf);
+      else self.read();
+    });
+    self.stream.on('end', function() {
+      self.stream = null;
+      self.reading = false;
+      self.read();
+    });
+    return;
+  }
 
   if (self.waiting) return;
   if (self.idx >= this.tpl.length) return this.push(null);
@@ -48,9 +64,8 @@ streamstache.prototype._read = function(n) {
 
     if (typeof self.map[id] != 'undefined') {
       if (self.map[id] instanceof Stream) {
-        self.map[id].resume();
-        // todo: insert real stream
-        if (!self.push('<#Stream>')) return;
+        self.stream = self.map[id];
+        return;
       } else {
         if (!self.push(self.map[id])) return;
       }
@@ -68,13 +83,7 @@ streamstache.prototype._read = function(n) {
 
 // todo: don't pause if used in same tick
 streamstache.prototype.set = function(key, value) {
-  if (value instanceof Stream) value = pause(value);
+  if (value instanceof Stream) value.pause();
   this.map[key] = value;
   this.ee.emit(key, value);
 };
-
-function pause(str) {
-  var p = PassThrough();
-  p.pause();
-  return str.pipe(p);
-}
