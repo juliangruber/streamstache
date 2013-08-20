@@ -31,7 +31,6 @@ streamstache.prototype._read = function(n) {
     self.stream.on('readable', function() {
       var buf = self.stream.read(n);
       if (buf) self.push(buf);
-      else self.read();
     });
     self.stream.on('end', function() {
       self.stream = null;
