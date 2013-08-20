@@ -1,5 +1,6 @@
 var fs = require('fs');
-var Readable = require('stream').Readable;
+var Stream = require('stream');
+var Readable = Stream.Readable;
 var inherits = require('util').inherits;
 var EventEmitter = require('events').EventEmitter;
 
@@ -46,7 +47,11 @@ streamstache.prototype._read = function(n) {
     if (!id) continue;
 
     if (typeof self.map[id] != 'undefined') {
-      if (!self.push(self.map[id])) return;
+      if (self.map[id] instanceof Stream) {
+        if (!self.push('<#Stream>')) return;
+      } else {
+        if (!self.push(self.map[id])) return;
+      }
       continue;
     }
 
