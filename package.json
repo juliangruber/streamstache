@@ -1,0 +1,25 @@
+{
+  "name" : "streamstache",
+  "description" : "Mustache + Streams for node and browsers.",
+  "version" : "0.0.0",
+  "repository" : {
+    "type" : "git",
+    "url" : "git://github.com/juliangruber/streamstache.git"
+  },
+  "homepage": "https://github.com/juliangruber/streamstache",
+  "main" : "index.js",
+  "scripts" : {
+    "test" : "tape test/*.js"
+  },
+  "dependencies" : {},
+  "devDependencies" : {
+    "tape" : "*"
+  },
+  "keywords": ["template","stream","streams","mustache","language"],
+  "author": {
+    "name": "Julian Gruber",
+    "email": "mail@juliangruber.com",
+    "url": "http://juliangruber.com"
+  },
+  "license": "MIT"
+}
