@@ -14,7 +14,7 @@ function streamstache(tpl) {
   this.tpl = tpl;
   this.idx = 0;
   this.map = {};
-  this.waiting = false;
+  this.waiting = 0;
 }
 
 inherits(streamstache, Readable);
@@ -50,9 +50,9 @@ streamstache.prototype._read = function(n) {
       continue;
     }
 
-    self.waiting = true;
+    self.waiting++;
     self.ee.once(id, function(value) {
-      self.waiting = false;
+      self.waiting--;
       self.push(value);
     });
     return;
