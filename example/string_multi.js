@@ -1,7 +1,7 @@
 var streamstache = require('..');
 var fs = require('fs');
 
-var tmpl = streamstache(fs.readFileSync(__dirname + '/string_multi.html'));
+var tmpl = streamstache(fs.readFileSync(__dirname + '/multi.html'));
 tmpl.set('foo', 'bar');
 
 setTimeout(function() {
