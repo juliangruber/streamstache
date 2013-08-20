@@ -1,6 +1,7 @@
 var fs = require('fs');
 var Readable = require('stream').Readable;
 var inherits = require('util').inherits;
+var EventEmitter = require('events').EventEmitter;
 
 module.exports = streamstache;
 
@@ -9,6 +10,7 @@ function streamstache(tpl) {
   Readable.call(this);
 
   if (typeof tpl != 'string') tpl = tpl.toString();
+  this.ee = new EventEmitter;
   this.tpl = tpl;
   this.idx = 0;
   this.map = {};
@@ -45,9 +47,9 @@ streamstache.prototype._read = function(n) {
       this.push(this.map[id]);
     } else {
       this.waiting = true;
-      this.once(id, function(value) {
-        this.waiting = false;
-        this.push(value);
+      this.ee.once(id, function(value) {
+        self.waiting = false;
+        self.push(value);
       });
       break;
     }
@@ -56,5 +58,5 @@ streamstache.prototype._read = function(n) {
 
 streamstache.prototype.set = function(key, value) {
   this.map[key] = value;
-  this.emit(key, value);
+  this.ee.emit(key, value);
 };
