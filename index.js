@@ -64,8 +64,7 @@ streamstache.prototype._read = function(n) {
 
     if (typeof self.map[id] != 'undefined') {
       if (self.map[id] instanceof Stream) {
-        self.stream = self.map[id];
-        return;
+        return self.stream = self.map[id];
       } else {
         if (!self.push(self.map[id])) return;
       }
@@ -75,7 +74,13 @@ streamstache.prototype._read = function(n) {
     self.waiting++;
     self.ee.once(id, function(value) {
       self.waiting--;
-      self.push(value);
+      if (value instanceof Stream) {
+        self.stream = value;
+        self.push('');
+        self.read();
+      } else {
+        self.push(value);
+      }
     });
     return;
   }
