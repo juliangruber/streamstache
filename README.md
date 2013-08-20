@@ -58,6 +58,11 @@ todo.
 
 ### streamstache#set(key, value)
 
+## TODO
+
+* turn examples into tests
+* figure out the syntax and feature set to support
+
 ## Installation
 
 With [npm](https://npmjs.org) do:
