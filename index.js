@@ -19,6 +19,8 @@ function streamstache(tpl) {
 
 inherits(streamstache, Readable);
 
+// todo: memoize
+
 streamstache.prototype._read = function(n) {
   var self = this;
 
@@ -44,7 +46,7 @@ streamstache.prototype._read = function(n) {
     if (!id) continue;
 
     if (typeof self.map[id] != 'undefined') {
-      self.push(self.map[id]);
+      if (!self.push(self.map[id])) return;
       continue;
     }
 
