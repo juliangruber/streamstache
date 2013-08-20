@@ -22,7 +22,6 @@ function streamstache(tpl) {
 inherits(streamstache, Readable);
 
 // todo: memoize
-
 streamstache.prototype._read = function(n) {
   var self = this;
 
@@ -50,6 +49,7 @@ streamstache.prototype._read = function(n) {
     if (typeof self.map[id] != 'undefined') {
       if (self.map[id] instanceof Stream) {
         self.map[id].resume();
+        // todo: insert real stream
         if (!self.push('<#Stream>')) return;
       } else {
         if (!self.push(self.map[id])) return;
@@ -66,6 +66,7 @@ streamstache.prototype._read = function(n) {
   }
 };
 
+// todo: don't pause if used in same tick
 streamstache.prototype.set = function(key, value) {
   if (value instanceof Stream) value = pause(value);
   this.map[key] = value;
