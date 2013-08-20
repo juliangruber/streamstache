@@ -22,10 +22,10 @@ inherits(streamstache, Readable);
 streamstache.prototype._read = function(n) {
   var self = this;
 
-  if (this.waiting) return;
+  if (self.waiting) return;
+  if (self.idx >= this.tpl.length) return this.push(null);
 
-  if (this.idx >= this.tpl.length) return this.push(null);
-  var range = this.tpl.slice(this.idx, this.idx + n);
+  var range = self.tpl.slice(self.idx, self.idx + n);
 
   function match(reg) {
     var m = reg.exec(range);
@@ -35,24 +35,25 @@ streamstache.prototype._read = function(n) {
     return m[1];
   }
 
-  while (true) {
+  while(true) {
     var txt = match(/^([^{]+)/);
-    if (txt) this.push(txt);
+    if (txt) self.push(txt);
 
     var id = match(/^{([^}]+)}/);
     if (!id && !txt) return;
     if (!id) continue;
 
-    if (typeof this.map[id] != 'undefined') {
-      this.push(this.map[id]);
-    } else {
-      this.waiting = true;
-      this.ee.once(id, function(value) {
-        self.waiting = false;
-        self.push(value);
-      });
-      break;
+    if (typeof self.map[id] != 'undefined') {
+      self.push(self.map[id]);
+      continue;
     }
+
+    self.waiting = true;
+    self.ee.once(id, function(value) {
+      self.waiting = false;
+      self.push(value);
+    });
+    return;
   }
 };
 
