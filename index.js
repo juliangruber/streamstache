@@ -6,8 +6,8 @@ var EventEmitter = require('events').EventEmitter;
 
 module.exports = streamstache;
 
-function streamstache(tpl) {
-  if (!(this instanceof streamstache)) return new streamstache(tpl);
+function streamstache(tpl, scope) {
+  if (!(this instanceof streamstache)) return new streamstache(tpl, scope);
   Readable.call(this);
 
   if (typeof tpl != 'string') tpl = tpl.toString();
@@ -18,6 +18,13 @@ function streamstache(tpl) {
   this.scope = {};
   this.waiting = 0;
   this.reading = false;
+
+  if (scope) {
+    var self = this;
+    Object.keys(scope).forEach(function(key) {
+      self.set(key, scope[key]);
+    });
+  }
 }
 
 inherits(streamstache, Readable);

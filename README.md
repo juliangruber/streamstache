@@ -58,7 +58,7 @@ Lorem ipsum dolor sit amet...</div>
 
 todo.
 
-### streamstache(tpl)
+### streamstache(tpl[, scope])
 
 ### streamstache#set(key, value)
 
