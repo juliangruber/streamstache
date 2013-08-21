@@ -13,8 +13,8 @@ function streamstache(tpl) {
   if (typeof tpl != 'string') tpl = tpl.toString();
 
   this.ee = new EventEmitter;
-  this.tpl = tpl;
-  this.idx = 0;
+  this.tokens = tpl.split(/[{}]/);
+  this.idx = -1;
   this.map = {};
   this.waiting = 0;
   this.reading = false;
@@ -41,47 +41,37 @@ streamstache.prototype._read = function(n) {
   }
 
   if (self.waiting) return;
-  if (self.idx >= this.tpl.length) return this.push(null);
+  if (self.idx >= self.tokens.length) return self.push(null);
 
-  var range = self.tpl.slice(self.idx, self.idx + n);
-
-  function match(reg) {
-    var m = reg.exec(range);
-    if (!m) return false;
-    range = range.slice(m[0].length);
-    self.idx += m[0].length;
-    return m[1];
-  }
-
-  while(true) {
-    var txt = match(/^([^{]+)/);
-    if (txt) self.push(txt);
-
-    var id = match(/^{([^}]+)}/);
-    if (!id && !txt) return;
-    if (!id) continue;
-
-    if (typeof self.map[id] != 'undefined') {
-      if (self.map[id] instanceof Stream) {
-        return self.stream = self.map[id];
-      } else {
-        if (!self.push(self.map[id])) return;
+  while(++self.idx < self.tokens.length) {
+    var token = self.tokens[self.idx];
+    if (self.idx % 2 == 0) {
+      var text = token;
+      if (!self.push(text)) return;
+    } else {
+      var id = token;
+      if (typeof self.map[id] != 'undefined') {
+        if (self.map[id] instanceof Stream) {
+          return self.stream = self.map[id];
+        } else {
+          if (!self.push(self.map[id])) return;
+        }
+        continue;
       }
-      continue;
+
+      self.waiting++;
+      self.ee.once(id, function(value) {
+        self.waiting--;
+        if (value instanceof Stream) {
+          self.stream = value;
+          self.push('');
+          self.read();
+        } else {
+          self.push(value);
+        }
+      });
+      return;
     }
-
-    self.waiting++;
-    self.ee.once(id, function(value) {
-      self.waiting--;
-      if (value instanceof Stream) {
-        self.stream = value;
-        self.push('');
-        self.read();
-      } else {
-        self.push(value);
-      }
-    });
-    return;
   }
 };
 
