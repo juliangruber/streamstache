@@ -1,6 +1,5 @@
 (function(e){if("function"==typeof bootstrap)bootstrap("streamstache",e);else if("object"==typeof exports)module.exports=e();else if("function"==typeof define&&define.amd)define(e);else if("undefined"!=typeof ses){if(!ses.ok())return;ses.makeStreamstache=e}else"undefined"!=typeof window?window.streamstache=e():global.streamstache=e()})(function(){var define,ses,bootstrap,module,exports;
 return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require=="function"&&require;if(!s&&o)return o(n,!0);if(r)return r(n,!0);throw new Error("Cannot find module '"+n+"'")}var u=t[n]={exports:{}};e[n][0].call(u.exports,function(t){var r=e[n][1][t];return i(r?r:t)},u,u.exports)}return t[n].exports}var r=typeof require=="function"&&require;for(var s=0;s<n.length;s++)i(n[s]);return i})({1:[function(require,module,exports){
-var fs = require('fs');
 var Stream = require('stream');
 var Readable = Stream.Readable || require('readable-stream').Readable;
 var inherits = require('util').inherits;
@@ -46,6 +45,7 @@ streamstache.prototype._read = function(n) {
 
   while(++self.idx < self.tokens.length) {
     var token = self.tokens[self.idx];
+
     if (self.idx % 2 == 0) {
       var text = token;
       if (!self.push(text)) return;
@@ -83,7 +83,7 @@ streamstache.prototype.set = function(key, value) {
   this.ee.emit(key, value);
 };
 
-},{"events":9,"fs":10,"readable-stream":7,"stream":11,"util":13}],2:[function(require,module,exports){
+},{"events":9,"readable-stream":7,"stream":10,"util":12}],2:[function(require,module,exports){
 (function(process){// Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -155,7 +155,7 @@ function onend() {
 }
 
 })(require("__browserify_process"))
-},{"./_stream_readable":4,"./_stream_writable":6,"__browserify_process":18,"util":13}],3:[function(require,module,exports){
+},{"./_stream_readable":4,"./_stream_writable":6,"__browserify_process":17,"util":12}],3:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -198,7 +198,7 @@ PassThrough.prototype._transform = function(chunk, encoding, cb) {
   cb(null, chunk);
 };
 
-},{"./_stream_transform":5,"util":13}],4:[function(require,module,exports){
+},{"./_stream_transform":5,"util":12}],4:[function(require,module,exports){
 (function(process,Buffer){// Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -1118,7 +1118,7 @@ function endReadable(stream) {
 }
 
 })(require("__browserify_process"),require("__browserify_Buffer").Buffer)
-},{"__browserify_Buffer":17,"__browserify_process":18,"events":9,"stream":11,"string_decoder":12,"util":13}],5:[function(require,module,exports){
+},{"__browserify_Buffer":16,"__browserify_process":17,"events":9,"stream":10,"string_decoder":11,"util":12}],5:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -1325,7 +1325,7 @@ function done(stream, er) {
   return stream.push(null);
 }
 
-},{"./_stream_duplex":2,"util":13}],6:[function(require,module,exports){
+},{"./_stream_duplex":2,"util":12}],6:[function(require,module,exports){
 (function(process,Buffer){// Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -1695,7 +1695,7 @@ function endWritable(stream, state, cb) {
 }
 
 })(require("__browserify_process"),require("__browserify_Buffer").Buffer)
-},{"./_stream_duplex":2,"__browserify_Buffer":17,"__browserify_process":18,"assert":8,"stream":11,"util":13}],7:[function(require,module,exports){
+},{"./_stream_duplex":2,"__browserify_Buffer":16,"__browserify_process":17,"assert":8,"stream":10,"util":12}],7:[function(require,module,exports){
 exports = module.exports = require('./lib/_stream_readable.js');
 exports.Readable = exports;
 exports.Writable = require('./lib/_stream_writable.js');
@@ -2020,7 +2020,7 @@ assert.doesNotThrow = function(block, /*optional*/error, /*optional*/message) {
 assert.ifError = function(err) { if (err) {throw err;}};
 
 })()
-},{"buffer":15,"util":13}],9:[function(require,module,exports){
+},{"buffer":14,"util":12}],9:[function(require,module,exports){
 (function(process){if (!process.EventEmitter) process.EventEmitter = function () {};
 
 var EventEmitter = exports.EventEmitter = process.EventEmitter;
@@ -2206,10 +2206,7 @@ EventEmitter.prototype.listeners = function(type) {
 };
 
 })(require("__browserify_process"))
-},{"__browserify_process":18}],10:[function(require,module,exports){
-// nothing to see here... no file methods for the browser
-
-},{}],11:[function(require,module,exports){
+},{"__browserify_process":17}],10:[function(require,module,exports){
 var events = require('events');
 var util = require('util');
 
@@ -2330,7 +2327,7 @@ Stream.prototype.pipe = function(dest, options) {
   return dest;
 };
 
-},{"events":9,"util":13}],12:[function(require,module,exports){
+},{"events":9,"util":12}],11:[function(require,module,exports){
 (function(Buffer){var StringDecoder = exports.StringDecoder = function(encoding) {
   this.encoding = (encoding || 'utf8').toLowerCase().replace(/[-_]/, '');
   switch (this.encoding) {
@@ -2494,7 +2491,7 @@ function base64DetectIncompleteChar(buffer) {
 }
 
 })(require("__browserify_Buffer").Buffer)
-},{"__browserify_Buffer":17}],13:[function(require,module,exports){
+},{"__browserify_Buffer":16}],12:[function(require,module,exports){
 var events = require('events');
 
 exports.isArray = isArray;
@@ -2847,7 +2844,7 @@ exports.format = function(f) {
   return str;
 };
 
-},{"events":9}],14:[function(require,module,exports){
+},{"events":9}],13:[function(require,module,exports){
 exports.readIEEE754 = function(buffer, offset, isBE, mLen, nBytes) {
   var e, m,
       eLen = nBytes * 8 - mLen - 1,
@@ -2933,7 +2930,7 @@ exports.writeIEEE754 = function(buffer, value, offset, isBE, mLen, nBytes) {
   buffer[offset + i - d] |= s * 128;
 };
 
-},{}],15:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 (function(){var assert = require('assert');
 exports.Buffer = Buffer;
 exports.SlowBuffer = Buffer;
@@ -4017,7 +4014,7 @@ Buffer.prototype.writeDoubleBE = function(value, offset, noAssert) {
 };
 
 })()
-},{"./buffer_ieee754":14,"assert":8,"base64-js":16}],16:[function(require,module,exports){
+},{"./buffer_ieee754":13,"assert":8,"base64-js":15}],15:[function(require,module,exports){
 (function (exports) {
 	'use strict';
 
@@ -4103,7 +4100,7 @@ Buffer.prototype.writeDoubleBE = function(value, offset, noAssert) {
 	module.exports.fromByteArray = uint8ToBase64;
 }());
 
-},{}],17:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 require=(function(e,t,n,r){function i(r){if(!n[r]){if(!t[r]){if(e)return e(r);throw new Error("Cannot find module '"+r+"'")}var s=n[r]={exports:{}};t[r][0](function(e){var n=t[r][1][e];return i(n?n:e)},s,s.exports)}return n[r].exports}for(var s=0;s<r.length;s++)i(r[s]);return i})(typeof require!=="undefined"&&require,{1:[function(require,module,exports){
 // UTILITY
 var util = require('util');
@@ -7965,7 +7962,7 @@ SlowBuffer.prototype.writeDoubleBE = Buffer.prototype.writeDoubleBE;
 },{}]},{},[])
 ;;module.exports=require("buffer-browserify")
 
-},{}],18:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
