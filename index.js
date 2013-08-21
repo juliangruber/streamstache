@@ -1,6 +1,6 @@
 var Stream = require('stream');
 var Readable = Stream.Readable
-  || require('readable-stream/lib/_stream_readable').Readable;
+  || require('readable-stream/lib/_stream_readable');
 var inherits = require('util').inherits;
 var EventEmitter = require('events').EventEmitter;
 
