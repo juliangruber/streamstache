@@ -3,6 +3,10 @@
 
 Mustache + Streams for node and browsers.
 
+[![testling badge](https://ci.testling.com/juliangruber/streamstache.png)](https://ci.testling.com/juliangruber/streamstache)
+
+[![build status](https://secure.travis-ci.org/juliangruber/streamstache.png)](http://travis-ci.org/juliangruber/streamstache)
+
 ## Example
 
 Given this template:
