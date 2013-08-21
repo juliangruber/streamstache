@@ -22,7 +22,6 @@ function streamstache(tpl) {
 
 inherits(streamstache, Readable);
 
-// todo: memoize
 streamstache.prototype._read = function(n) {
   var self = this;
 
