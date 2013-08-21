@@ -1,7 +1,7 @@
 {
   "name": "streamstache",
   "description": "Mustache + Streams for node and browsers.",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "repository": {
     "type": "git",
     "url": "git://github.com/juliangruber/streamstache.git"
