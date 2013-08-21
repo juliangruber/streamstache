@@ -77,7 +77,14 @@ streamstache.prototype._read = function(n) {
 
 // todo: don't pause if used in same tick
 streamstache.prototype.set = function(key, value) {
-  if (value instanceof Stream) value.pause();
+  if (value instanceof Stream) {
+    if (typeof value.read != 'function') {
+      var r = Readable();
+      r.wrap(value);
+      value = r;
+    }
+    value.pause();
+  }
   this.scope[key] = value;
   this.ee.emit(key, value);
 };
