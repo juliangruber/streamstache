@@ -12,18 +12,28 @@ function streamstache(tpl, scope) {
 
   if (typeof tpl != 'string') tpl = tpl.toString();
 
-  this.ee = new EventEmitter;
-  this.tokens = tpl.split(/[{}]/);
-  this.idx = -1;
-  this.scope = {};
-  this.waiting = 0;
-  this.reading = false;
+  var self = this;
+  self.ee = new EventEmitter;
+  self.tokens = tpl.split(/[{}]/);
+  self.idx = -1;
+  self.scope = {};
+  self.waiting = 0;
+  self.reading = false;
 
   if (scope) {
-    var self = this;
     Object.keys(scope).forEach(function(key) {
       self.set(key, scope[key]);
     });
+  }
+
+  if (Object.defineProperty) {
+    for (var i = 1; i < self.tokens.length; i += 2) (function (key) {
+      if (self[key]) throw new Error('reserved key: ' + key);
+      Object.defineProperty(self, key, {
+        get: function() { return self.get(key) },
+        set: function(value) { self.set(key, value) }
+      });
+    })(self.tokens[i]);
   }
 }
 

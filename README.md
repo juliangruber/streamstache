@@ -52,7 +52,14 @@ Lorem ipsum dolor sit amet...</div>
 
 ## Syntax
 
-* `{<id>}`: Gets replaced with the `String` or `Stream` set under `id`.
+* `{<key>}`: Gets replaced with the `String` or `Stream` set under `key`.
+
+Reserved keys:
+
+* get
+* set
+* setEncoding
+* pipe
 
 ## API
 
@@ -60,8 +67,10 @@ todo.
 
 ### streamstache(tpl[, scope])
 
+### streamstache#{key} = value
 ### streamstache#set(key, value)
 
+### streamstache#{key}
 ### streamstache#get(key)
 
 ### streamstache#setEncoding(encoding)
