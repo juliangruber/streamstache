@@ -82,8 +82,7 @@ streamstache.prototype.set = function(key, value) {
       var r = Readable();
       r.wrap(value);
       value = r;
-    }
-    value.pause();
+    } 
   }
   this.scope[key] = value;
   this.ee.emit(key, value);

@@ -20,11 +20,11 @@ test('stream multi', function(t) {
 
 function rs () {
   var s = Readable();
-  process.nextTick(function() {
+  s._read = function() {
     s.push('oh');
     s.push('hai');
     s.push(null);
-  });
+  };
   return s;
 }
 
