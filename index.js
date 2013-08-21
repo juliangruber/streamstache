@@ -84,8 +84,8 @@ streamstache.prototype._read = function(n) {
         if (value instanceof Stream) {
           self.stream = value;
           // this is messed up
-          self.push();
-          self.read();
+          self.push('');
+          self.read(0);
         } else {
           self.push(value);
         }
