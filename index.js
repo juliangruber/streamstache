@@ -1,4 +1,3 @@
-var fs = require('fs');
 var Stream = require('stream');
 var Readable = Stream.Readable || require('readable-stream').Readable;
 var inherits = require('util').inherits;
