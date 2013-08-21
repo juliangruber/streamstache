@@ -18,7 +18,8 @@ function streamstache(tpl, scope) {
   self.idx = -1;
   self.scope = {};
   self.waiting = 0;
-  self.reading = false;
+  self.streaming = false;
+  self.parsing = false;
 
   if (scope) {
     Object.keys(scope).forEach(function(key) {
@@ -39,41 +40,40 @@ function streamstache(tpl, scope) {
 
 inherits(streamstache, Readable);
 
-streamstache.prototype._read = function(n) {
+streamstache.prototype.stream = function(s) {
   var self = this;
+  self.streaming = true;
+  s.on('readable', function() {
+    var buf = s.read();
+    if (buf) self.push(buf);
+  });
+  s.on('end', function() {
+    self.streaming = false;
+    self.parse();
+  });
+};
 
-  if (self.stream && !self.reading) {
-    self.reading = true;
-    self.stream.on('readable', function() {
-      var buf = self.stream.read(n);
-      if (buf) self.push(buf);
-    });
-    self.stream.on('end', function() {
-      self.stream = null;
-      self.reading = false;
-      // this is messed up
-      self.push('');
-      self.read(0);
-    });
-  }
-  if (self.stream) return;
+streamstache.prototype.parse = function() {
+  this.parsing = true;
+  this._parse();
+  this.parsing = false;
+};
 
-  if (self.waiting) return;
-  if (self.idx >= self.tokens.length) return self.push(null);
-
+streamstache.prototype._parse = function() {
+  var self = this;
   while(++self.idx < self.tokens.length) {
     var token = self.tokens[self.idx];
 
-    if (self.idx % 2 == 0) {
+    if (self.idx % 2 === 0) {
       var text = token;
-      if (!self.push(text)) return;
+      if (!self.push(text)) break;
     } else {
       var id = token;
       if (typeof self.scope[id] != 'undefined') {
         if (self.scope[id] instanceof Stream) {
-          return self.stream = self.scope[id];
+          return self.stream(self.scope[id]);
         } else {
-          if (!self.push(self.scope[id])) return;
+          if (!self.push(self.scope[id])) break;
         }
         continue;
       }
@@ -82,10 +82,7 @@ streamstache.prototype._read = function(n) {
       self.ee.once(id, function(value) {
         self.waiting--;
         if (value instanceof Stream) {
-          self.stream = value;
-          // this is messed up
-          self.push('');
-          self.read(0);
+          self.stream(value);
         } else {
           self.push(value);
         }
@@ -93,6 +90,15 @@ streamstache.prototype._read = function(n) {
       return;
     }
   }
+
+  if (self.idx >= self.tokens.length) self.push(null);
+};
+
+streamstache.prototype._read = function() {
+  if (this.parsing || this.streaming || this.waiting) return;
+  if (this.idx >= this.tokens.length - 1) return this.push(null);
+
+  this.parse();
 };
 
 streamstache.prototype.set = function(key, value) {
