@@ -44,6 +44,7 @@ streamstache.prototype._read = function(n) {
 
   while(++self.idx < self.tokens.length) {
     var token = self.tokens[self.idx];
+
     if (self.idx % 2 == 0) {
       var text = token;
       if (!self.push(text)) return;
