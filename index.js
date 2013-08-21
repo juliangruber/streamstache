@@ -86,3 +86,7 @@ streamstache.prototype.set = function(key, value) {
   this.scope[key] = value;
   this.ee.emit(key, value);
 };
+
+streamstache.prototype.get = function(key) {
+  return this.scope[key];
+};

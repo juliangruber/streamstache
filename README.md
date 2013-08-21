@@ -62,6 +62,8 @@ todo.
 
 ### streamstache#set(key, value)
 
+### streamstache#get(key)
+
 ### streamstache#setEncoding(encoding)
 
 ### streamstache#pipe(stream)
