@@ -23,10 +23,10 @@ var fs = require('fs');
 var tmpl = streamstache(fs.readFileSync(__dirname + '/multi.html'));
 tmpl.pipe(process.stdout);
 
-tmpl.set('foo', 'bar');
+tmpl.foo = 'bar';
 
 setTimeout(function() {
-  tmpl.set('bar', fs.createReadStream(__dirname + '/lorem.txt'));
+  tmpl.bar = fs.createReadStream(__dirname + '/lorem.txt');
 }, 500);
 ```
 
