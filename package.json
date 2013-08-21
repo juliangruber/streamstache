@@ -15,7 +15,7 @@
     "readable-stream": "~1.0.15"
   },
   "devDependencies": {
-    "tape": "*"
+    "tape": "~1.0.4"
   },
   "keywords": [
     "template",
