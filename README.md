@@ -90,7 +90,7 @@ For node or browserify install with [npm](https://npmjs.org):
 npm install streamstache
 ```
 
-For browser usage as a standalone library, include a build from the [dist](https://github.com/juliangruber/streamstache/tree/master/dist) directory.
+For browser usage as a standalone library, grab a build from the [dist](https://github.com/juliangruber/streamstache/tree/master/dist) directory.
 
 ## License
 
