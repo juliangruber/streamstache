@@ -68,8 +68,8 @@ todo.
 
 ## TODO
 
-* turn examples into tests
 * figure out the syntax and feature set to support
+* iteration over streams
 
 ## Installation
 
