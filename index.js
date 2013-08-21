@@ -14,7 +14,7 @@ function streamstache(tpl) {
   this.ee = new EventEmitter;
   this.tokens = tpl.split(/[{}]/);
   this.idx = -1;
-  this.map = {};
+  this.scope = {};
   this.waiting = 0;
   this.reading = false;
 }
@@ -49,11 +49,11 @@ streamstache.prototype._read = function(n) {
       if (!self.push(text)) return;
     } else {
       var id = token;
-      if (typeof self.map[id] != 'undefined') {
-        if (self.map[id] instanceof Stream) {
-          return self.stream = self.map[id];
+      if (typeof self.scope[id] != 'undefined') {
+        if (self.scope[id] instanceof Stream) {
+          return self.stream = self.scope[id];
         } else {
-          if (!self.push(self.map[id])) return;
+          if (!self.push(self.scope[id])) return;
         }
         continue;
       }
@@ -77,6 +77,6 @@ streamstache.prototype._read = function(n) {
 // todo: don't pause if used in same tick
 streamstache.prototype.set = function(key, value) {
   if (value instanceof Stream) value.pause();
-  this.map[key] = value;
+  this.scope[key] = value;
   this.ee.emit(key, value);
 };
