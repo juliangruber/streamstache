@@ -58,6 +58,10 @@ todo.
 
 ### streamstache#set(key, value)
 
+### streamstache#setEncoding(encoding)
+
+### streamstache#pipe(stream)
+
 ## TODO
 
 * turn examples into tests
@@ -65,11 +69,13 @@ todo.
 
 ## Installation
 
-With [npm](https://npmjs.org) do:
+For node or browserify install with [npm](https://npmjs.org):
 
 ```bash
 npm install streamstache
 ```
+
+For browser usage as a standalone library, include a build from the [dist](https://github.com/juliangruber/streamstache/tree/master/dist) directory.
 
 ## License
 
