@@ -51,10 +51,12 @@ streamstache.prototype._read = function(n) {
     self.stream.on('end', function() {
       self.stream = null;
       self.reading = false;
-      self.read();
+      // this is messed up
+      self.push('');
+      self.read(0);
     });
-    return;
   }
+  if (self.stream) return;
 
   if (self.waiting) return;
   if (self.idx >= self.tokens.length) return self.push(null);
@@ -81,7 +83,8 @@ streamstache.prototype._read = function(n) {
         self.waiting--;
         if (value instanceof Stream) {
           self.stream = value;
-          self.push('');
+          // this is messed up
+          self.push();
           self.read();
         } else {
           self.push(value);
