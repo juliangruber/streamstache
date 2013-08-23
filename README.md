@@ -1,4 +1,3 @@
-
 # streamstache
 
 Mustache + Streams for node and browsers.
@@ -12,8 +11,8 @@ Mustache + Streams for node and browsers.
 Given this template:
 
 ```html
-<div id="foo"></div>
-<div id="bar"></div>
+<div>{foo}</div>
+<div>{bar}</div>
 ```
 
 ```js
@@ -33,15 +32,15 @@ setTimeout(function() {
 The output is:
 
 ```html
-<div id="foo">bar</div>
-<div id="bar">Lorem ipsum dolor sit amet...</div>
+<div>bar</div>
+<div>Lorem ipsum dolor sit amet...</div>
 ```
 
 Because **streamstache** is streaming, the output arrives in 2 chunks, as `bar`  is only set after 500ms. The first chunk is:
 
 ```html
-<div id="foo">bar</div>
-<div id="bar">
+<div>bar</div>
+<div>
 ```
 
 The second and last chunk then is:
