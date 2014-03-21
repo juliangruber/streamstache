@@ -4,7 +4,7 @@ var concat = require('concat-stream');
 
 test('true block', function(t) {
   t.plan(1);
-  var tmpl = streamstache('<div>{#beep}TRUE!{/#beep}</div>');
+  var tmpl = streamstache('<div>{#beep}TRUE!{/beep}</div>');
   tmpl.set('beep', true);
   tmpl.pipe(concat(function (src) {
     t.equal(src.toString('utf8'), '<div>TRUE!</div>');
@@ -13,7 +13,7 @@ test('true block', function(t) {
 
 test('false block', function(t) {
   t.plan(1);
-  var tmpl = streamstache('<div>{#boop}FALSE!{/#boop}</div>');
+  var tmpl = streamstache('<div>{#boop}FALSE!{/boop}</div>');
   tmpl.set('boop', false);
   tmpl.pipe(concat(function (src) {
     t.equal(src.toString('utf8'), '<div></div>');

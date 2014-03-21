@@ -14,9 +14,10 @@ function streamstache(tpl, scope) {
 
   var self = this;
   self.ee = new EventEmitter;
-  self.tokens = tpl.split(/[{}]/);
+  self.tokens = tpl.split(/({[^}]+})/);
   self.idx = -1;
   self.scope = {};
+  self.stack = [];
   self.waiting = 0;
   self.streaming = false;
   self.parsing = false;
@@ -28,7 +29,10 @@ function streamstache(tpl, scope) {
   }
 
   if (Object.defineProperty) {
-    for (var i = 1; i < self.tokens.length; i += 2) (function (key) {
+    for (var i = 1; i < self.tokens.length; i += 2) (function (token) {
+      if (/^{\/#/.test(token)) return;
+ 
+      var key = token.replace(/^{(?:#|\/#)?/, '').replace(/}$/, '');
       if (self[key]) throw new Error('reserved key: ' + key);
       Object.defineProperty(self, key, {
         get: function() { return self.get(key) },
@@ -63,32 +67,60 @@ streamstache.prototype._parse = function() {
   var self = this;
   while(++self.idx < self.tokens.length) {
     var token = self.tokens[self.idx];
+    var top = self.stack[self.stack.length-1];
 
     if (self.idx % 2 === 0) {
+      if (top && top.show === false) continue;
       var text = token;
       if (!self.push(text)) break;
-    } else {
-      var id = token;
-      if (typeof self.scope[id] != 'undefined') {
-        if (self.scope[id] instanceof Stream) {
-          return self.stream(self.scope[id]);
-        } else {
-          if (!self.push(self.scope[id])) break;
-        }
-        continue;
-      }
-
-      self.waiting++;
-      self.ee.once(id, function(value) {
-        self.waiting--;
-        if (value instanceof Stream) {
-          self.stream(value);
-        } else {
-          self.push(value);
-        }
-      });
-      return;
+      continue;
     }
+ 
+    var id = token.replace(/^{[#\/]?/, '').replace(/}$/, '');
+ 
+    if (/{#/.test(token)) {
+      top = { id: id };
+      self.stack.push(top);
+    } else if (/{\//.test(token)) {
+      if (!top || top.id !== id) {
+        return self.emit('error', new Error(
+          "Closing token name doesn't match opening token name at this scope."
+          + '\nExpected: ' + id
+          + '\nActual: ' + (top && top.id)
+        ));
+      }
+      top = self.stack.pop();
+    }
+ 
+    var v = self.scope[id];
+    if (typeof v != 'undefined') {
+      if (v instanceof Stream) {
+        return self.stream(v);
+      } else if (/^{#/.test(token)) {
+        top.show = Boolean(v);
+        // loops would go here...
+      } else if (top.show !== false && !/^{\//.test(token)) {
+        if (typeof v !== 'string') v = String(v);
+        if (!self.push(v)) break;
+      }
+      continue;
+    }
+
+    self.waiting++;
+    self.ee.once(id, function(value) {
+      var top = self.stack[self.stack.length-1];
+      self.waiting--;
+      if (top && top.show === false) {
+        // nop
+      } else if (value instanceof Stream) {
+        self.stream(value);
+      } else if (typeof value === 'string') {
+        self.push(value);
+      } else {
+        self.push(String(value));
+      }
+    });
+    return;
   }
 
   if (self.idx >= self.tokens.length) self.push(null);
