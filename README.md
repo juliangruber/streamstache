@@ -51,6 +51,8 @@ Lorem ipsum dolor sit amet...</div>
 
 ## Syntax
 
+### Interpolation
+
 * `{<key>}`: Gets replaced with the `String` or `Stream` set under `key`.
 
 Reserved keys:
@@ -59,6 +61,12 @@ Reserved keys:
 * set
 * setEncoding
 * pipe
+
+### Conditional Blocks
+
+`{#<key>}...{/<key>}` denotes a conditional block. If the value for `key` is
+true, the contents `...` get rendered. Otherwise, the entire block is omitted
+from the output.
 
 ## API
 
