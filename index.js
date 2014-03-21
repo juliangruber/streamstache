@@ -67,10 +67,10 @@ streamstache.prototype._parse = function() {
   var self = this;
   while(++self.idx < self.tokens.length) {
     var token = self.tokens[self.idx];
-    var top = self.stack[self.stack.length-1];
+    var top = self.stack[self.stack.length-1] || {};
 
     if (self.idx % 2 === 0) {
-      if (top && top.show === false) continue;
+      if (top.show === false) continue;
       var text = token;
       if (!self.push(text)) break;
       continue;
@@ -82,11 +82,11 @@ streamstache.prototype._parse = function() {
       top = { id: id };
       self.stack.push(top);
     } else if (/{\//.test(token)) {
-      if (!top || top.id !== id) {
+      if (top.id !== id) {
         return self.emit('error', new Error(
           "Closing token name doesn't match opening token name at this scope."
           + '\nExpected: ' + id
-          + '\nActual: ' + (top && top.id)
+          + '\nActual: ' + top.id
         ));
       }
       top = self.stack.pop();
@@ -108,9 +108,9 @@ streamstache.prototype._parse = function() {
 
     self.waiting++;
     self.ee.once(id, function(value) {
-      var top = self.stack[self.stack.length-1];
+      var top = self.stack[self.stack.length-1] || {};
       self.waiting--;
-      if (top && top.show === false) {
+      if (top.show === false) {
         // nop
       } else if (value instanceof Stream) {
         self.stream(value);
