@@ -7,7 +7,7 @@ test('array loop', function(t) {
   var tmpl = streamstache(
     '<div>{#critters}'
     + 'The {name} says {msg}.\n' 
-    + '{/critter}</div>'
+    + '{/critters}</div>'
   );
   tmpl.set('critters', [
     { name: 'cow', msg: 'moo' },

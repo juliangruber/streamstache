@@ -3,6 +3,7 @@ var Readable = Stream.Readable
   || require('readable-stream/lib/_stream_readable');
 var inherits = require('util').inherits;
 var EventEmitter = require('events').EventEmitter;
+var isarray = require('isarray');
 
 module.exports = streamstache;
 
@@ -89,16 +90,28 @@ streamstache.prototype._parse = function() {
           + '\nActual: ' + top.id
         ));
       }
-      top = self.stack.pop();
+      if (top.scopes && top.scopes.length) {
+        top.scope = top.scopes.shift();
+        self.idx = top.index;
+      } else top = self.stack.pop();
     }
  
-    var v = self.scope[id];
+    var v = self._lookup(id);
     if (typeof v != 'undefined') {
       if (v instanceof Stream) {
         return self.stream(v);
       } else if (/^{#/.test(token)) {
-        top.show = top.show === false ? false : Boolean(v);
-        // loops would go here...
+        if (isarray(v) && v.length) {
+          top.scopes = v.slice();
+          top.index = self.idx;
+          if (v.length > 0) {
+            top.scope = top.scopes.shift();
+          }
+        } else if (isarray(v)) {
+          top.show = false;
+        } else if (top.show !== false) {
+          top.show = Boolean(v);
+        }
       } else if (top.show !== false && !/^{\//.test(token)) {
         if (typeof v !== 'string') v = String(v);
         if (!self.push(v)) break;
@@ -147,4 +160,14 @@ streamstache.prototype.set = function(key, value) {
 
 streamstache.prototype.get = function(key) {
   return this.scope[key];
+};
+
+streamstache.prototype._lookup = function(id) {
+  for (var i = this.stack.length - 1; i >= 0; i--) {
+    var sc = this.stack[i].scope;
+    if (sc && {}.hasOwnProperty.call(sc, id)) {
+      return sc[id];
+    }
+  }
+  return this.scope[id];
 };
