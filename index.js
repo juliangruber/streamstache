@@ -54,8 +54,7 @@ streamstache.prototype.stream = function(s) {
   if (isEnum) {
     top.stream = s;
     top.index = self.idx;
-    s.once('end', function () { top.ended = true });
-    return;
+    return true;
   }
 
   s.on('readable', function() {
@@ -81,7 +80,7 @@ streamstache.prototype._parse = function() {
     var top = self.stack[self.stack.length-1] || {};
 
     if (self.idx % 2 === 0) {
-      if (top.show === false) continue;
+      if (top.show === false || top.ended) continue;
       var text = token;
       if (!self.push(text)) break;
       continue;
@@ -104,12 +103,25 @@ streamstache.prototype._parse = function() {
         top.scope = top.scopes.shift();
         self.idx = top.index;
       } else if (top.stream && !top.ended) {
-        var row = top.stream.read();
         self.idx = top.index;
+        top.scope = null;
       } else top = self.stack.pop();
     }
  
     if (top.show === false) continue;
+    if (top.stream && !top.scope) return (function onread(first) {
+      if (top.ended) return self._parse();
+      var row = top.stream.read();
+      if (!first && row === null) {
+        top.ended = true;
+        return self._parse();
+      }
+      if (!row) return top.stream.once('readable', onread);
+      top.scope = row;
+      
+      var v = self._lookup(id);
+      if (push(v)) self._parse();
+    })(true);
  
     var v = self._lookup(id);
     if (typeof v != 'undefined') {
@@ -127,9 +139,9 @@ streamstache.prototype._parse = function() {
 
   if (self.idx >= self.tokens.length) self.push(null);
  
-  function push (v) {
+  function push(v) {
     var top = self.stack[self.stack.length-1] || {};
-    if (top.show === false) {
+    if (top.show === false || top.ended) {
       return true;
     } else if (v instanceof Stream) {
       return self.stream(v);
