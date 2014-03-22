@@ -48,13 +48,18 @@ streamstache.prototype.stream = function(s) {
   self.streaming = true;
  
   var top = self.stack[self.stack.length-1];
-  var isEnum = top && top.id && !top.scopes;
+  //var isEnum = top && top.id && !top.scopes;
+  var isEnum = s._readableState.objectMode;
   if (isEnum) {
+    if (!top) return true;
     top.stream = typeof s.read != 'function'
       ? Readable().wrap(s)
       : s
     ;
     top.index = self.idx;
+    top.stream.on('end', function () {
+        top.ended = true;
+    });
     return true;
   }
 
@@ -81,13 +86,14 @@ streamstache.prototype._parse = function() {
     var top = self.stack[self.stack.length-1] || {};
 
     if (self.idx % 2 === 0) {
-      if (top.show === false || top.ended) continue;
+      if (top.show === false || top.stop) continue;
       var text = token;
       if (!self.push(text)) break;
       continue;
     }
  
     var id = token.replace(/^{[#\/]?/, '').replace(/}$/, '');
+    if (top.ended) top.stop = true;
  
     if (/{#/.test(token)) {
       top = { id: id, show: top.show };
@@ -106,7 +112,10 @@ streamstache.prototype._parse = function() {
       } else if (top.stream && !top.ended) {
         self.idx = top.index;
         top.scope = null;
-      } else top = self.stack.pop();
+      } else {
+        top = self.stack.pop();
+        continue;
+      }
     }
  
     if (top.show === false) continue;
