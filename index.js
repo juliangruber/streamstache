@@ -118,7 +118,10 @@ streamstache.prototype._parse = function() {
     }
  
     function push (v) {
-      if (v instanceof Stream) {
+      var top = self.stack[self.stack.length-1] || {};
+      if (top.show === false) {
+        return true;
+      } else if (v instanceof Stream) {
         return self.stream(v);
       } else if (/^{#/.test(token)) {
         if (isarray(v) && v.length) {
@@ -141,17 +144,8 @@ streamstache.prototype._parse = function() {
 
     self.waiting++;
     self.ee.once(id, function(value) {
-      var top = self.stack[self.stack.length-1] || {};
       self.waiting--;
-      if (top.show === false) {
-        // nop
-      } else if (value instanceof Stream) {
-        self.stream(value);
-      } else if (typeof value === 'string') {
-        self.push(value);
-      } else {
-        self.push(String(value));
-      }
+      push(value);
     });
     return;
   }
