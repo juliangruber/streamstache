@@ -48,6 +48,16 @@ inherits(streamstache, Readable);
 streamstache.prototype.stream = function(s) {
   var self = this;
   self.streaming = true;
+ 
+  var top = self.stack[self.stack.length-1];
+  var isEnum = top && top.id && !top.scopes;
+  if (isEnum) {
+    top.stream = s;
+    top.index = self.idx;
+    s.once('end', function () { top.ended = true });
+    return;
+  }
+
   s.on('readable', function() {
     var buf = s.read();
     if (buf) self.push(buf);
@@ -93,6 +103,9 @@ streamstache.prototype._parse = function() {
       if (top.scopes && top.scopes.length) {
         top.scope = top.scopes.shift();
         self.idx = top.index;
+      } else if (top.stream && !top.ended) {
+        var row = top.stream.read();
+        self.idx = top.index;
       } else top = self.stack.pop();
     }
  
@@ -100,6 +113,11 @@ streamstache.prototype._parse = function() {
  
     var v = self._lookup(id);
     if (typeof v != 'undefined') {
+      if (!push(v)) break;
+      continue;
+    }
+ 
+    function push (v) {
       if (v instanceof Stream) {
         return self.stream(v);
       } else if (/^{#/.test(token)) {
@@ -116,9 +134,9 @@ streamstache.prototype._parse = function() {
         }
       } else if (top.show !== false && !/^{\//.test(token)) {
         if (typeof v !== 'string') v = String(v);
-        if (!self.push(v)) break;
+        return self.push(v);
       }
-      continue;
+      return true;
     }
 
     self.waiting++;
