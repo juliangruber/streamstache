@@ -50,14 +50,14 @@ test('array with nested arrays', function(t) {
   var tmpl = streamstache(
     '<div>{#critters}'
     + '{#foods}'
-    + 'The {name} eats {msg}.\n' 
+    + 'The {name} eats {food}.\n' 
     + '{/foods}\n---\n'
     + '{/critters}</div>'
   );
   tmpl.set('critters', [
-    { name: 'cow', foods: [ 'grass', 'clovers' ] },
-    { name: 'crow', foods: [ 'bugs', 'fish' ] },
-    { name: 'human', foods: [ 'garbage', 'plastic' ] },
+    { name: 'cow', foods: [ { food: 'grass' },  { food: 'clovers' } ] },
+    { name: 'crow', foods: [ { food: 'bugs' }, { food: 'fish' } ] },
+    { name: 'human', foods: [ { food: 'garbage' }, { food: 'plastic' } ] },
     { name: 'rock', foods: [] }
   ]);
   tmpl.pipe(concat(function (src) {

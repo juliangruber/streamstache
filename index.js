@@ -96,6 +96,8 @@ streamstache.prototype._parse = function() {
       } else top = self.stack.pop();
     }
  
+    if (top.show === false) continue;
+ 
     var v = self._lookup(id);
     if (typeof v != 'undefined') {
       if (v instanceof Stream) {
