@@ -79,7 +79,7 @@ streamstache.prototype._parse = function() {
     var id = token.replace(/^{[#\/]?/, '').replace(/}$/, '');
  
     if (/{#/.test(token)) {
-      top = { id: id };
+      top = { id: id, show: top.show };
       self.stack.push(top);
     } else if (/{\//.test(token)) {
       if (top.id !== id) {
@@ -97,7 +97,7 @@ streamstache.prototype._parse = function() {
       if (v instanceof Stream) {
         return self.stream(v);
       } else if (/^{#/.test(token)) {
-        top.show = Boolean(v);
+        top.show = top.show === false ? false : Boolean(v);
         // loops would go here...
       } else if (top.show !== false && !/^{\//.test(token)) {
         if (typeof v !== 'string') v = String(v);
