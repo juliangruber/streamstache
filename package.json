@@ -12,8 +12,8 @@
     "test": "tape test/*.js"
   },
   "dependencies": {
-    "isarray": "0.0.1",
-    "readable-stream": "~1.0.15"
+    "isarray": "~0.0.1",
+    "readable-stream": "~1.1.11"
   },
   "devDependencies": {
     "tape": "~1.0.4",
