@@ -71,7 +71,8 @@ Otherwise, the entire block is omitted from the output.
 ### Array Blocks
 
 `{#<key>}...{/<key>}` denotes an array block. For every item in the array
-denoted by `key`, the block will execute.
+denoted by `key`, the block will execute where the contents of the array create
+a new innermost scope.
 
 ## API
 
