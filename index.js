@@ -116,31 +116,6 @@ streamstache.prototype._parse = function() {
       if (!push(v)) break;
       continue;
     }
- 
-    function push (v) {
-      var top = self.stack[self.stack.length-1] || {};
-      if (top.show === false) {
-        return true;
-      } else if (v instanceof Stream) {
-        return self.stream(v);
-      } else if (/^{#/.test(token)) {
-        if (isarray(v) && v.length) {
-          top.scopes = v.slice();
-          top.index = self.idx;
-          if (v.length > 0) {
-            top.scope = top.scopes.shift();
-          }
-        } else if (isarray(v)) {
-          top.show = false;
-        } else if (top.show !== false) {
-          top.show = Boolean(v);
-        }
-      } else if (top.show !== false && !/^{\//.test(token)) {
-        if (typeof v !== 'string') v = String(v);
-        return self.push(v);
-      }
-      return true;
-    }
 
     self.waiting++;
     self.ee.once(id, function(value) {
@@ -151,6 +126,31 @@ streamstache.prototype._parse = function() {
   }
 
   if (self.idx >= self.tokens.length) self.push(null);
+ 
+  function push (v) {
+    var top = self.stack[self.stack.length-1] || {};
+    if (top.show === false) {
+      return true;
+    } else if (v instanceof Stream) {
+      return self.stream(v);
+    } else if (/^{#/.test(token)) {
+      if (isarray(v) && v.length) {
+        top.scopes = v.slice();
+        top.index = self.idx;
+        if (v.length > 0) {
+          top.scope = top.scopes.shift();
+        }
+      } else if (isarray(v)) {
+        top.show = false;
+      } else if (top.show !== false) {
+        top.show = Boolean(v);
+      }
+    } else if (top.show !== false && !/^{\//.test(token)) {
+      if (typeof v !== 'string') v = String(v);
+      return self.push(v);
+    }
+    return true;
+  }
 };
 
 streamstache.prototype._read = function() {
