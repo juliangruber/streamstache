@@ -51,6 +51,8 @@ Lorem ipsum dolor sit amet...</div>
 
 ## Syntax
 
+### Interpolation
+
 * `{<key>}`: Gets replaced with the `String` or `Stream` set under `key`.
 
 Reserved keys:
@@ -59,6 +61,31 @@ Reserved keys:
 * set
 * setEncoding
 * pipe
+
+### Blocks
+
+Blocks are denoted with `{#<key>}...{/<key>}` but take on different roles
+depending on the content in the scope at `key`.
+
+When the value for a block is an array, the content is looped over for each
+element in the array with the scope augmented by the array element value.
+
+When the value for a block is a stream, the content is looped over each time a
+new row arrives, augmenting the scope with the row value until the stream ends.
+
+When the value for a block is anything else, it is treated as a boolean.
+When a boolean is false, the content between `{#key}` and `{/key}` is hidden.
+Otherwise, the content is shown.
+
+### Array Blocks
+
+`{#<key>}...{/<key>}` denotes an array block. For every item in the array
+denoted by `key`, the block will execute where the contents of the array create
+a new innermost scope.
+
+### Stream Blocks
+
+
 
 ## API
 
