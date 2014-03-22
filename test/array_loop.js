@@ -44,3 +44,34 @@ test('array with nested booleans', function(t) {
     + '</div>');
   }));
 });
+
+test('array with nested arrays', function(t) {
+  t.plan(1);
+  var tmpl = streamstache(
+    '<div>{#critters}'
+    + '{#foods}'
+    + 'The {name} eats {msg}.\n' 
+    + '{/foods}\n---\n'
+    + '{/critters}</div>'
+  );
+  tmpl.set('critters', [
+    { name: 'cow', foods: [ 'grass', 'clovers' ] },
+    { name: 'crow', foods: [ 'bugs', 'fish' ] },
+    { name: 'human', foods: [ 'garbage', 'plastic' ] },
+    { name: 'rock', foods: [] }
+  ]);
+  tmpl.pipe(concat(function (src) {
+    t.equal(src.toString('utf8'), '<div>'
+      + 'The cow eats grass.\n'
+      + 'The cow eats clovers.\n'
+      + '\n---\n'
+      + 'The crow eats bugs.\n'
+      + 'The crow eats fish.\n'
+      + '\n---\n'
+      + 'The human eats garbage.\n'
+      + 'The human eats plastic.\n'
+      + '\n---\n'
+      + '\n---\n'
+    + '</div>');
+  }));
+});
