@@ -64,9 +64,14 @@ Reserved keys:
 
 ### Conditional Blocks
 
-`{#<key>}...{/<key>}` denotes a conditional block. If the value for `key` is
-true, the contents `...` get rendered. Otherwise, the entire block is omitted
-from the output.
+`{#<key>}...{/<key>}` denotes a conditional block when the value for `key` is a
+boolean. When the value of `key` is true, the contents `...` get rendered.
+Otherwise, the entire block is omitted from the output.
+
+### Array Blocks
+
+`{#<key>}...{/<key>}` denotes an array block. For every item in the array
+denoted by `key`, the block will execute.
 
 ## API
 
