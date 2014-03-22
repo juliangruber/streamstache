@@ -22,3 +22,25 @@ test('array loop', function(t) {
     + '</div>');
   }));
 });
+
+test('array with nested booleans', function(t) {
+  t.plan(1);
+  var tmpl = streamstache(
+    '<div>{#critters}'
+    + '{#show}'
+    + 'The {name} says {msg}.\n' 
+    + '{/show}'
+    + '{/critters}</div>'
+  );
+  tmpl.set('critters', [
+    { name: 'cow', msg: 'moo', show: true },
+    { name: 'crow', msg: 'caw', show: false },
+    { name: 'human', msg: 'blorp', show: true }
+  ]);
+  tmpl.pipe(concat(function (src) {
+    t.equal(src.toString('utf8'), '<div>'
+      + 'The cow says moo.\n'
+      + 'The human says blorp.\n'
+    + '</div>');
+  }));
+});
