@@ -33,6 +33,7 @@ function streamstache(tpl, scope) {
  
       var key = token.replace(/^{(?:#|\/#)?/, '').replace(/}$/, '');
       if (self[key]) throw new Error('reserved key: ' + key);
+      if (self.hasOwnProperty(key)) return;
       Object.defineProperty(self, key, {
         get: function() { return self.get(key) },
         set: function(value) { self.set(key, value) }
