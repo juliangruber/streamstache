@@ -33,6 +33,7 @@ function streamstache(tpl, scope) {
  
       var key = token.replace(/^{(?:#|\/#)?/, '').replace(/}$/, '');
       if (self[key]) throw new Error('reserved key: ' + key);
+      if (self.hasOwnProperty(key)) return;
       Object.defineProperty(self, key, {
         get: function() { return self.get(key) },
         set: function(value) { self.set(key, value) }
@@ -48,13 +49,19 @@ streamstache.prototype.stream = function(s) {
   self.streaming = true;
  
   var top = self.stack[self.stack.length-1];
-  var isEnum = top && top.id && !top.scopes;
+  var isEnum = s._readableState.objectMode;
   if (isEnum) {
+    if (!top) return true;
     top.stream = typeof s.read != 'function'
       ? Readable().wrap(s)
       : s
     ;
+    top.times = 0;
     top.index = self.idx;
+    top.stream.on('end', function () {
+      top.ended = true;
+      if (top._waiting) top._waiting();
+    });
     return true;
   }
 
@@ -81,14 +88,14 @@ streamstache.prototype._parse = function() {
     var top = self.stack[self.stack.length-1] || {};
 
     if (self.idx % 2 === 0) {
-      if (top.show === false || top.ended) continue;
+      if (top.show === false) continue;
       var text = token;
       if (!self.push(text)) break;
       continue;
     }
  
     var id = token.replace(/^{[#\/]?/, '').replace(/}$/, '');
- 
+
     if (/{#/.test(token)) {
       top = { id: id, show: top.show };
       self.stack.push(top);
@@ -106,18 +113,32 @@ streamstache.prototype._parse = function() {
       } else if (top.stream && !top.ended) {
         self.idx = top.index;
         top.scope = null;
-      } else top = self.stack.pop();
+      } else {
+        self.stack.pop();
+        continue;
+      }
     }
  
     if (top.show === false) continue;
-    if (top.stream && !top.scope) return (function onread(first) {
-      if (top.ended) return self._parse();
-      var row = top.stream.read();
-      if (!first && row === null) {
+    if (top.stream && !top.scope) return (function onread() {
+      if (top._waiting) {
+        top._waiting = null;
         top.ended = true;
+        top.show = false;
         return self._parse();
       }
-      if (!row) return top.stream.once('readable', onread);
+ 
+      if (top.ended) return self._parse();
+      var row = top.stream.read();
+      if (top.times++ !== 0 && row === null) {
+        top.ended = true;
+        top.show = false;
+        return self._parse();
+      }
+      if (!row) {
+        top._waiting = onread;
+        return top.stream.once('readable', onread);
+      }
       top.scope = row;
       
       var v = self._lookup(id);
