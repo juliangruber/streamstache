@@ -12,13 +12,13 @@
     "test": "tape test/*.js"
   },
   "dependencies": {
-    "isarray": "~0.0.1",
-    "readable-stream": "~1.1.11"
+    "isarray": "~2.0.1",
+    "readable-stream": "~2.2.2"
   },
   "devDependencies": {
-    "tape": "~1.0.4",
+    "tape": "~4.6.3",
     "through": "~2.3.4",
-    "concat-stream": "~1.4.4"
+    "concat-stream": "~1.5.2"
   },
   "keywords": [
     "template",
